@@ -1,7 +1,9 @@
+@import url(http://fonts.googleapis.com/css?family=Share+Tech+Mono);
+
 body {
 	margin: 0;
 	padding: 0;
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-family: 'Share Tech Mono', Helvetica, Arial, sans-serif;
 	font-size: 13px;
 	line-height: 18px;
 	color: #fff;
@@ -20,4 +22,106 @@ body {
 #page h1 {
 	margin: 200px auto 0;
 	text-align: center;
+}
+
+#page #menuwrapper {
+	position: absolute;
+	top: 20%;
+	width: 100%;
+}
+#page #menu {
+	width: 30%;
+	padding: 2%; 
+	margin: 0 auto;
+	background: #222;
+}
+
+#page #menu h1 {
+	margin: 0;
+	padding-bottom: 5%;
+	font-size: 2.5em;
+	text-align: center;
+	border-bottom: 1px solid #333;
+}
+
+#page #menu p {
+	text-align: center;
+	font-size: 1.5em;
+}
+
+#page #menu ul {
+	margin: 5% 0;
+	padding: 0;
+	list-style: none;
+	overflow: auto;
+}
+#page #menu ul li {
+	width: 25%;
+	display:block;
+	float: left;
+	text-align:center;
+}
+#page #menu ul li a {
+	display: block;
+	margin: 0 auto;
+	background: none;
+	padding: 20% 0;
+	width: 92%;
+	text-align:center;
+	font-size: 4em;
+	color:#fff;
+	text-decoration: none;
+	border: 2px solid #333;
+}
+#page #menu ul li a.selected {
+	border: 2px solid #0c0;
+}
+#page #menu ul li a:hover {
+	background: #333;
+}
+
+#page #menu #start {
+	width: 100%;
+	padding: 2% 0 3%;
+	background: #333;
+	font-family: 'Share Tech Mono', Helvetica, Arial, sans-serif;
+	color: #fff;
+	font-size: 2em;
+	cursor:pointer;
+	border: 0;
+}
+
+#page #menu #start:hover {
+	background: #555;
+}
+#page #menu #start:active {
+	background: #0c0;
+}
+
+#page #scoreboard {
+	position: absolute;
+	z-index: 100;
+	font-size: 2.5em;
+	margin: 0;
+	top: 2%;
+	left: 2%;
+	width: 20%;
+}
+#page #scoreboard p {
+	overflow: auto;
+	color:#666;
+	margin: 0;
+	padding: 0;
+	line-height: 1.5em;
+}
+#page #scoreboard p span.player {
+	float: left;
+	display:block;
+}
+#page #scoreboard p.active {
+	color: #fff;
+}
+#page #scoreboard p span.score {
+	float: right;
+	display:block;
 }

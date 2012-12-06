@@ -29,8 +29,10 @@ var UDP = require("dgram");
 var UDPSocket = UDP.createSocket("udp4");
 
 UDPSocket.on("message", function (msg, info) {
+	var str = msg.toString();
+	console.log(str);
 	for(var c in clients) {
-		clients[c].send(msg.toString());
+		clients[c].send(str);
 	}
 });
 

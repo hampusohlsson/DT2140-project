@@ -3,8 +3,9 @@ define([
 	'jquery',
 	'underscore',
 	'backbone',
-	'models/game'
-], function(namespace, $, _, Backbone, Game) {
+	'text!templates/tpl-main.html',
+	'views/view-game'
+], function(namespace, $, _, Backbone, mainTemplate, gameView) {
 	
 	var self,
 		target,
@@ -14,19 +15,38 @@ define([
 
 		el: '#page',
 
+		players: 1,
+
+		events: {
+			'click #players a' : function(e) {
+				$('#players a').removeClass('selected');
+				$(e.target).addClass('selected');
+				app.trigger('menu:setPlayers', $(e.target).data('players'));
+			},
+
+			'click #start': function() {
+				app.trigger('menu:startGame');
+			}
+		},
+
 		initialize: function() {
-			app.bind('server:established', this.start, this);
+			app.bind('menu:setPlayers', this.setPlayers, this);
+			app.bind('menu:startGame', this.startGame, this);
 		},
 
 		render: function() {
-			
+			this.$el.removeClass('loading');
+			var tpl = _.template(mainTemplate, {});
+			this.$el.html(tpl);
 		},
 
-		start: function() {
-			this.$el.removeClass('loading');
-			namespace.game = new Game();
-		}
-		
+		setPlayers: function(players) {
+			this.players = players;
+		},
+
+		startGame: function(e) {
+			gameView.render({ players: this.players });
+		},
 
 	});
 

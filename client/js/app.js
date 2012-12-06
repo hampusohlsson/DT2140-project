@@ -32,7 +32,6 @@ define([
 	var initialize = function() {
 		
 		app.router = new Router();
-		app.socket = new Socket();
 
 		Backbone.history.start({ 
 			pushState: true, 
