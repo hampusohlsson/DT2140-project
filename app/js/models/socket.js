@@ -34,7 +34,7 @@ define([
 			//Socket for Tuio commands
 			var tuio = new Tuio.Client({ host: "http://127.0.0.1:8080" });
 			tuio.on("connect", this.onConnectTuio);
-            tuio.on("addTuioCursor", this.onAddTuioCursor);
+			tuio.on("addTuioCursor", this.onAddTuioCursor);
 
 			//Connect Tuio
 			tuio.connect();
