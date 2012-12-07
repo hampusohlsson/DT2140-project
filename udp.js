@@ -4,7 +4,7 @@ var client = dgram.createSocket("udp4");
 var x = Math.floor(Math.random()*1000),
 	y = Math.floor(Math.random()*400);
 
-var message = new Buffer("{\"action\":2,\"Hello\":\"World\"}");
+var message = new Buffer("{\"action\":8}");
 var host = "127.0.0.1";
 var port = 5555;
 

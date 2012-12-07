@@ -77,6 +77,7 @@ define([
 			//Create target
 			var target = paper.circle(w/2, h/2, h/5).attr({
 				'stroke': "none", 
+				'fill': Raphael.hsb(0, 0.4, 1)
 			});
 
 			//Store canvas and target
@@ -178,11 +179,15 @@ define([
 		},
 
 		onPause: function() {
-			this.get('target').pause();
+			self.get('target').pause();
+			self.get('countdown').pause();
+			self.get('pointsText').pause();
 		},
 
 		onPlay: function() {
-			this.get('target').resume();
+			self.get('target').resume();
+			self.get('countdown').resume();
+			self.get('pointsText').resume();
 		},
 
 		onMute: function() {
@@ -190,13 +195,17 @@ define([
 		},
 
 		onFaster: function() {
+			this.get('target').stop();
 			var v = this.get('speed');
 			this.set('speed', v*2);
+			this.animate(this.get('target'));
 		},
 
 		onSlower: function() {
+			this.get('target').stop();
 			var v = this.get('speed');
 			this.set('speed', v/2);
+			this.animate(this.get('target'));
 		},
 
 		onBigger: function() {
@@ -406,10 +415,10 @@ define([
 			var maxPoints = 100;
 
 			self.pointsInterval = setInterval(function() {
-				maxPoints -= 1;
+				if(maxPoints > 0) maxPoints -= 1;
 				self.get('pointsText').attr('text', maxPoints);
 				self.set('points', maxPoints);
-			}, 10000/100);
+			}, (30*1000)/100);
 
 			countdown.animate({
 				'height': 0,
@@ -418,11 +427,11 @@ define([
 				callback: function() {
 					self.nextPlayer();
 				}
-			}, 10*1000);
+			}, 30*1000);
 
 			pointsText.animate({
 				'y': height+y
-			}, 10*1000);
+			}, 30*1000);
 
 		},
 
@@ -499,7 +508,10 @@ define([
 			if(s < t.attr('r')) {
 				this.playSound('hit');
 				this.hit();
-				this.playerCountdown();
+				
+				if(this.get('numPlayers') > 1)
+					this.playerCountdown();
+
 				var flash = paper.rect(0,0,this.get('w'),this.get('h')).attr({
 					fill: '#fff'
 				});
@@ -541,9 +553,11 @@ define([
 		},
 
 		resizeTarget: function(amount) {
-			this.get('target').animate({ 
-				r: radius*amount,
-			}, 500);
+			var target = this.get('target');
+			var r = target.attr('r');
+			target.animate({
+				r: r*amount
+			}, 300);
 		}
 
 	});
