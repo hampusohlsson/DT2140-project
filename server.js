@@ -1,3 +1,6 @@
+/**
+ * The ports used
+ */
 var ports = {
 		http: 80,
 		tuio: 8080,
@@ -20,7 +23,7 @@ app.get('/', function (req, res) {
 });
 
 /**
- * TUIO Handling - Port 3333
+ * TUIO Handling
  */
 var tuio = require("tuio");
 
@@ -31,7 +34,7 @@ tuio.init({
 });
 
 /**
- * General UDP Data Handling - Port 4444
+ * General UDP Data Handling
  */
 var dgram = require("dgram"),
 	UDP = dgram.createSocket("udp4");
