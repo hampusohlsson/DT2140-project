@@ -2,11 +2,11 @@
  * The ports used
  */
 var ports = {
-		http: 80,
-		tuio: 8080,
-		tuioUDP: 3333,
-		dataUDP: 5555
-	}
+	http: 80,
+	tuio: 8080,
+	tuioUDP: 3333,
+	dataUDP: 5555
+}
 
 /**
  * HTTP Server

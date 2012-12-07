@@ -5,8 +5,8 @@ define([
 	'backbone',
 	'module',
 	'json',
-	'libs/tuio.min',
-	'libs/socket.io'
+	'tuio',
+	'socketio'
 ], function(namespace, $, _, Backbone, module) {
 	
 	var self,
@@ -52,8 +52,18 @@ define([
 			//Connect Tuio
 			tuio.connect();
 		},
+
+		onConnectData: function() {
+			console.log('[NETWORK] Connected to Data');
+			self.addConnection('data');
+		},
+
+		onConnectTuio: function() {
+			console.log('[NETWORK] Connected to TUIO');
+			self.addConnection('tuio');
+		},
 		
-		updateConnection: function(type) {
+		addConnection: function(type) {
 			var c = this.get('connections');
 			c[type] = 1;
 
@@ -63,31 +73,25 @@ define([
 			app.trigger('server:established');
 		},
 
-		onConnectData: function() {
-			console.log('[NETWORK] Connected to Data');
-			self.updateConnection('data');
-		},
-
-		onConnectTuio: function() {
-			console.log('[NETWORK] Connected to TUIO');
-			self.updateConnection('tuio');
-		},
-
 		onRawData: function(raw) {
-			var data = JSON.parse(raw);
-			app.trigger('server:action', data);
+			self.triggerAction(JSON.parse(raw));
 		},
 
 		onAddTuioObject: function(object) {
 			console.log(object);
+
 			var data = {
 				action: app.command.TARGET_HIT,
 				x: object.xPos,
 				y: object.yPos
 			}
 			
+			self.triggerAction(data);
+		},
+
+		triggerAction: function(data) {
 			app.trigger('server:action', data);
-		}
+		},
 
 	});
 

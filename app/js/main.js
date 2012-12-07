@@ -19,6 +19,8 @@
 			raphael: 'libs/raphael/raphael.2.1.0.amd',
 			text: 'libs/text',
 			json: 'libs/json2',
+			tuio: 'libs/tuio.min',
+			socketio: 'libs/socket.io'
 		},
 
 	});
