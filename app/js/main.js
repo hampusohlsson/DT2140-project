@@ -10,7 +10,7 @@
 
 		config: {
 			//custom settings
-			'app': { root: '/app' },
+			'app': { root: '/' },
 		},
 
 		paths : {
