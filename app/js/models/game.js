@@ -78,11 +78,7 @@ define([
     				
     			}
     			if(evt.keyCode == 83) {
-    				if(self.get('sounds')['bg'].paused) {
-    					self.playSound('bg');
-    				} else {
-    					self.stopSound('bg');
-    				}
+    				self.toggleSound('bg');
     			}
   			});
 		},
@@ -96,7 +92,7 @@ define([
 					var last = this.get('lastHit');
 					var time = (new Date()).getTime();
 
-					if(time-last < 500) 
+					if(time-last < 100) 
 						return;
 					
 					var x = this.get('w') * data.x;
@@ -269,6 +265,14 @@ define([
 			var players = this.get('players');
 			players[current].score += points; 
 			$('#player-id-'+current+' .score').text(players[current].score);
+		},
+
+		toggleSound: function(sound) {
+			if(self.get('sounds')[sound].paused) {
+    			self.playSound(sound);
+    		} else {
+    			self.stopSound(sound);
+    		}
 		},
 
 		playSound: function(sound) {

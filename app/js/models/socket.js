@@ -34,7 +34,20 @@ define([
 			//Socket for Tuio commands
 			var tuio = new Tuio.Client({ host: "http://127.0.0.1:8080" });
 			tuio.on("connect", this.onConnectTuio);
-			tuio.on("addTuioCursor", this.onAddTuioCursor);
+			tuio.on("addTuioCursor", this.onAddTuioObject);
+
+			/*
+			All TUIO events
+			==================================================
+            tuio.on("addTuioCursor", fn);
+			tuio.on("updateTuioCursor", fn);
+            tuio.on("removeTuioCursor", fn);
+            tuio.on("addTuioObject", fn);
+            tuio.on("updateTuioObject", fn);
+            tuio.on("removeTuioObject", fn);
+            tuio.on("refresh", fn);
+            ==================================================
+            */
 
 			//Connect Tuio
 			tuio.connect();
@@ -65,8 +78,8 @@ define([
 			app.trigger('server:action', data);
 		},
 
-		onAddTuioCursor: function(object) {
-
+		onAddTuioObject: function(object) {
+			console.log(object);
 			var data = {
 				action: app.command.TARGET_HIT,
 				x: object.xPos,

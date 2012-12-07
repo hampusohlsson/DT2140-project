@@ -14,10 +14,9 @@ var express = require('express'),
 
 app.listen(ports.http);
 app.use(express.static(__dirname + '/app'));
-app.set('view engine', 'jade');
 
 app.get('/', function (req, res) {
-	res.render('index.html');
+	res.sendfile('index.html');
 });
 
 /**
