@@ -78,14 +78,12 @@ define([
 		},
 
 		onAddTuioObject: function(object) {
-			console.log(object);
-
 			var data = {
 				action: app.command.TARGET_HIT,
 				x: object.xPos,
 				y: object.yPos
 			}
-			
+
 			self.triggerAction(data);
 		},
 

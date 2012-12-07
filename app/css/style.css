@@ -1,11 +1,14 @@
 @import url(http://fonts.googleapis.com/css?family=Share+Tech+Mono);
 
+html{
+    font-size: 100%;    
+}
+
 body {
 	margin: 0;
 	padding: 0;
 	font-family: 'Share Tech Mono', Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	line-height: 18px;
+	line-height: 1em;
 	color: #fff;
 	background: #333;
 }
@@ -39,7 +42,7 @@ body {
 #page #menu h1 {
 	margin: 0;
 	padding-bottom: 5%;
-	font-size: 2.5em;
+	font-size: 2em;
 	text-align: center;
 	border-bottom: 1px solid #333;
 }
@@ -68,7 +71,7 @@ body {
 	padding: 20% 0;
 	width: 92%;
 	text-align:center;
-	font-size: 4em;
+	font-size: 3em;
 	color:#fff;
 	text-decoration: none;
 	border: 2px solid #333;

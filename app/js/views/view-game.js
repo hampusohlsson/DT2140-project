@@ -24,22 +24,11 @@ define([
 			this.$el.html('');
 			this.$el.addClass('loading');
 
-			data.sounds = {
-				hit: 'sounds/hit.mp3',
-				miss: 'sounds/miss.mp3',
-				bg: 'sounds/bg.mp3'
-			}
-
 			var tpl = _.template(gameTemplate, data);
 			this.$el.html(tpl);
 
 			this.settings = {
 				numPlayers: data.players,
-				sounds: {
-					hit: document.getElementById('sound-hit'),
-					miss: document.getElementById('sound-miss'),
-					bg: document.getElementById('sound-bg')
-				}
 			}
 
 			app.socket = new Socket();

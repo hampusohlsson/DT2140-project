@@ -35,9 +35,13 @@ define([
 
 		app.command = {
 			TARGET_HIT: 1,
-			TARGET_SPEED: 2,
-			TARGET_COLOR: 3,
-			TARGET_SIZE: 4
+			PAUSE: 2,
+			PLAY: 3,
+			MUTE: 4,
+			FASTER: 5,
+			SLOWER: 6,
+			BIGGER: 7,
+			SMALLER: 8,
 		}
 
 		Backbone.history.start({ 
