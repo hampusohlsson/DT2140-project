@@ -1,0 +1,104 @@
+<!--
+Stores global settings for CCV Application
+//
+CCV XML Files:
+ - app_settings.xml
+ - camera_settings.xml
+ - gui_seetings.xml
+ - multiplexer_settings.xml
+ - template.xml
+ //
+CCV 1.5 UPDATES:
+CAMERATYPES
+Can now use VIDEO or CAMERA MULTIPLEXER MODES.
+-->
+<?xml version="1.0" ?>
+<CONFIG>
+    <MULTIPLEXER>
+        <WIDTH>640</WIDTH>
+        <HEIGHT>480</HEIGHT>
+        <FRAMERATE>60</FRAMERATE>
+        <!-- 
+		Setup CAMERATYPES that will be used. 
+		If you do not want to use a specific camera type - use 0, otherwise 1.
+		 -->
+        <CAMERATYPES>
+            <PS3>1</PS3>
+            <FFMV>1</FFMV>
+            <KINECT>1</KINECT>
+            <CMU>1</CMU>
+            <DIRECTSHOW>1</DIRECTSHOW>
+        </CAMERATYPES>
+    </MULTIPLEXER>
+    <VIDEO>
+        <FILENAME>videos/RearDI.m4v</FILENAME>
+    </VIDEO>
+    <!-- Choose MULTIPLEXER if want to use camera or VIDEO -->
+    <SOURCE>MULTIPLEXER</SOURCE>
+    <NETWORK>
+        <LOCALHOST>127.0.0.1</LOCALHOST>
+        <TUIO>0</TUIO>
+        <TUIOPORT_OUT>3333</TUIOPORT_OUT>
+        <TUIOFLASHPORT_OUT>3000</TUIOFLASHPORT_OUT>
+        <!-- set to 1 if want to receive TUIO 1.1 messages, 0 - for TUIO 1.0 -->
+        <VERSION>0</VERSION>
+        <OBJECTSASFIDUCIALS>0</OBJECTSASFIDUCIALS>
+    </NETWORK>
+    <BLOBS>
+        <MAXNUMBER>128</MAXNUMBER>
+    </BLOBS>
+    <APPLICATION>
+        <TITLE>Community Core Vision</TITLE>
+        <VERSION>1.5</VERSION>
+    </APPLICATION>
+    <WINDOW>
+        <WIDTH>927</WIDTH>
+        <HEIGHT>600</HEIGHT>
+    </WINDOW>
+    <BOOLEAN>
+        <PRESSURE>48</PRESSURE>
+        <LABELS>1</LABELS>
+        <OUTLINES>1</OUTLINES>
+        <LEARNBG>0</LEARNBG>
+        <TUIO>1</TUIO>
+        <WINTOUCH>0</WINTOUCH>
+        <!-- WINTOUCH is not activly available. -->
+        <VMIRROR>0</VMIRROR>
+        <HMIRROR>0</HMIRROR>
+        <HIGHPASS>1</HIGHPASS>
+        <AMPLIFY>1</AMPLIFY>
+        <SMOOTH>1</SMOOTH>
+        <GPU>0</GPU>
+        <!-- GPU is not activly availale. -->
+        <DYNAMICBG>0</DYNAMICBG>
+        <DYNAMICTH>1</DYNAMICTH>
+        <SNAPSHOT>0</SNAPSHOT>
+        <MINIMODE>0</MINIMODE>
+        <HEIGHTWIDTH>0</HEIGHTWIDTH>
+        <OSCMODE>1</OSCMODE>
+        <TCPMODE>0</TCPMODE>
+        <BINMODE>0</BINMODE>
+        <TRACKDARK>1</TRACKDARK>
+        <TRACKFINGERS>1</TRACKFINGERS>
+        <TRACKOBJECTS>0</TRACKOBJECTS>
+        <TRACKFIDUCIALS>0</TRACKFIDUCIALS>
+    </BOOLEAN>
+    <INT>
+        <MINMOVEMENT>1</MINMOVEMENT>
+        <MINBLOBSIZE>90</MINBLOBSIZE>
+        <MAXBLOBSIZE>286</MAXBLOBSIZE>
+        <BGLEARNRATE>255.418182</BGLEARNRATE>
+        <THRESHOLD>216</THRESHOLD>
+        <HIGHPASSBLUR>20</HIGHPASSBLUR>
+        <HIGHPASSNOISE>2</HIGHPASSNOISE>
+        <HIGHPASSAMP>19</HIGHPASSAMP>
+        <SMOOTH>3</SMOOTH>
+        <MINTEMPAREA>42</MINTEMPAREA>
+        <MAXTEMPAREA>200</MAXTEMPAREA>
+        <THRESHOLDSIZE>7</THRESHOLDSIZE>
+    </INT>
+    <FIDUCIAL>
+        <TILE>21</TILE>
+        <THRESHOLD>21</THRESHOLD>
+    </FIDUCIAL>
+</CONFIG>

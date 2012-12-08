@@ -26,12 +26,12 @@ define([
 			
 			console.log('[NETWORK] Connecting...');
 
-			//Socket for general commands
+			//TCP socket for general commands
 			var data = io.connect("http://127.0.0.1:80");
 			data.on("connect", this.onConnectData);
 			data.on("message", this.onRawData);
 
-			//Socket for Tuio commands
+			//TCP socket for Tuio commands
 			var tuio = new Tuio.Client({ host: "http://127.0.0.1:8080" });
 			tuio.on("connect", this.onConnectTuio);
 			tuio.on("addTuioCursor", this.onAddTuioObject);

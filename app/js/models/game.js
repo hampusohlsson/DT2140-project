@@ -17,6 +17,7 @@ define([
 			target: null,
 			sounds: {},
 			speed: 0.01,
+			mute: 0,
 			points: 100,
 			pause: 0,
 			hittesting: 0,
@@ -24,6 +25,7 @@ define([
 			numPlayers: 0,
 			currentPlayer: 0,
 			lastHit: 0,
+			secondsPerPlayer: 45,
 			w: window.innerWidth,
 			h: window.innerHeight
 		},
@@ -87,9 +89,8 @@ define([
 			//Init play pause control
 			this.playpause();
 
-			// Setup events
-			app.bind("server:action", this.delegate, this);
-			app.bind("server:error", this.stop, this);
+			// Catch server events
+			app.bind("server:action", this.events, this);
 
 			//Ready
 			this.log("[GAME] initialized");
@@ -99,125 +100,87 @@ define([
 		playpause: function() {
 			$(document).keyup(function(evt) {
     			if (evt.keyCode == 32) {
-    				var pause = self.get('pause');
-					self.set('pause', self.get('pause') ? 0 : 1);
-
-					if(self.get('pause')) {
-						self.get('target').resume();
-					} else {
-						self.get('target').pause();
-					}
-    				
+    				self.togglePause();
     			}
     			if(evt.keyCode == 83) {
-    				self.toggleSound('bg');
+    				self.toggleSound();
     			}
   			});
 		},
 
-		delegate: function(data) {
+		events: function(data) {
 
-			self.log('[GAME] Received action: '+data.action);
+			switch(data.action) {
 
-			try {
-				switch(data.action) {
+			case app.command.TARGET_HIT:
+				if(this.get('pause'))
+					return;
 
-				case app.command.TARGET_HIT:
-					this.onHit(data.x, data.y);
-					break;
+				var last = this.get('lastHit');
+				var time = (new Date()).getTime();
+
+				if(time-last < 100) 
+					return;
 				
-				case app.command.PAUSE:
-					this.onPause();
-					break;
+				var x = this.get('w') * data.x;
+				var y = this.get('h') * data.y;
 
-				case app.command.PLAY:
-					this.onPlay();
-					break;
-				
-				case app.command.MUTE:
-					this.onMute();
-					break;
+				this.hitTest(x, y);
+				this.set('lastHit', time);
+				break;
+			
+			case app.command.PAUSE:
+				this.togglePause();
+				break;
 
-				case app.command.FASTER:
-					this.onFaster();
-					break;
+			case app.command.PLAY:
+				this.togglePause();
+				break;
+			
+			case app.command.MUTE:
+				this.toggleSound();
+				break;
 
-				case app.command.SLOWER:
-					this.onSlower();
-					break;
+			case app.command.FASTER:
+				var t = this.get('target').stop(),
+					v = this.get('speed');
+				this.set('speed', v*1.5);
+				this.animate(t);
+				break;
 
-				case app.command.BIGGER:
-					this.onBigger();
-					break;
+			case app.command.SLOWER:
+				var t = this.get('target').stop(),
+					v = this.get('speed');
+				this.set('speed', v/1.5);
+				this.animate(t);
+				break;
 
-				case app.command.SMALLER:
-					this.onSmaller();
-					break;
+			case app.command.BIGGER:
+				this.resizeTarget(1.2);
+				break;
 
-				default:
-					self.log('[GAME] Received action: '+data.action);
-					break;
-				}
+			case app.command.SMALLER:
+				this.resizeTarget(0.8);
+				break;
 
-			} catch(error) {
-				console.error('[GAME] ' + error);
+			default:
+				self.log('[GAME] Unknown action: '+data.action);
+				break;
 			}
 		},
 
-		onHit: function(x, y) {
-			var last = this.get('lastHit');
-			var time = (new Date()).getTime();
-
-			if(time-last < 100) 
-				return;
-			
-			var x = this.get('w') * x;
-			var y = this.get('h') * y;
-
-			this.hitTest(x, y);
-			this.set('lastHit', time);
-		},
-
-		onPause: function() {
-			self.get('target').pause();
-			self.get('countdown').pause();
-			self.get('pointsText').pause();
-		},
-
-		onPlay: function() {
-			self.get('target').resume();
-			self.get('countdown').resume();
-			self.get('pointsText').resume();
-		},
-
-		onMute: function() {
-			this.toggleSound('bg');
-		},
-
-		onFaster: function() {
-			this.get('target').stop();
-			var v = this.get('speed');
-			this.set('speed', v*2);
-			this.animate(this.get('target'));
-		},
-
-		onSlower: function() {
-			this.get('target').stop();
-			var v = this.get('speed');
-			this.set('speed', v/2);
-			this.animate(this.get('target'));
-		},
-
-		onBigger: function() {
-			this.resizeTarget(1.2);
-		},
-
-		onSmaller: function() {
-			this.resizeTarget(0.8);
-		},
-
-		stop: function() {
-			this.get('target').stop();
+		togglePause: function() {
+			if(this.get('pause')) {
+				this.get('target').resume();
+				this.get('countdown').resume();
+				this.set('pause', 0);
+				this.unmute();
+			} else {
+				this.get('target').pause();
+				this.get('countdown').pause();
+				this.set('pause', 1);
+				this.mute();
+			}
 		},
 
 		start: function() {
@@ -228,7 +191,6 @@ define([
 			this.nextPlayer();
 
 			this.get('sounds').bg.play();
-			this.get('sounds').bg.volume = 0.7;
 
 			//Simulate UDP data
 
@@ -268,57 +230,25 @@ define([
 				cy = el.attr('cy'),
 				s = Math.sqrt(Math.pow(cx-x,2)+Math.pow(cy-y,2)),
 				v = this.get('speed'),
-				duration = Math.floor(s/v);
+				duration = Math.floor(s/v),
+				anim = [];
 
-			el.animate(Raphael.animation({
-				cx: x, 
-				cy: y,
+			el.animate({
+				cx:x, 
+				cy:y,
 				callback: function() {
 					self.animate(el);
 				}
-			}, duration));
-		/*	var r = el.attr('r'),
-				cx = el.attr('cx'), 
-				cy = el.attr('cy'),
-				h = this.get('h'),
-				w = this.get('w'),
-				tx, ty;
+			}, duration);
 
-			var dx = this.get('dx'), 
-				dy = this.get('dy');
+		},
 
-
-			if((dx > 0 && dy > 0)) {
-
-			} else if(dx > 0 && dy < 0) {
-
-			} else if(dx < 0 && dy > 0) {
-
-			} else if(dx < 0 && dy < 0) {
-
-			}
-
-			if((dy > 0 && cy+r >= h) || (dy < 0 && cy-r <= 0)) {
-				dy = -dy;
-				this.set('dy', dy);
-			}
-
-			if((dx > 0 && cx+r >= w) || (dx < 0 && cx-r <= 0)) {
-				dx = -dx;
-				this.set('dx', dx);
-			}
-
-			var s = Math.sqrt(Math.pow(cx-tx,2)+Math.pow(cy-ty,2)),
-				v = this.get('speed'),
-				t = Math.floor(s/v);
-
-			cx+=dx*v;
-			cy+=dy*v;
-
-			el.attr('cx', cx);
-			el.attr('cy', cy);*/
-			
-			
+		resizeTarget: function(amount) {
+			var target = this.get('target');
+			var r = target.attr('r');
+			target.animate({
+				r: r*amount
+			}, 300);
 		},
 
 		showText: function(text, color) {
@@ -348,8 +278,6 @@ define([
 
 		nextPlayer: function() {
 
-
-
 			var current = this.get('currentPlayer');
 			var next = (current % this.get('numPlayers')) + 1;
 			this.set('currentPlayer', next);
@@ -367,72 +295,83 @@ define([
 				fill: this.get('players')[next].color,
 			}, 100);
 
+
+			this.playerCountdown();
+
 			if(this.get('numPlayers') < 2)
 				return;
 
-			this.playerCountdown();
 			this.showText('Player '+next);
+
 		},
 
 		playerCountdown: function() {
 			
 			if(this.get('countdown'))
 				this.get('countdown').remove();
-			
-			if(this.get('pointsText'))
-				this.get('pointsText').remove();
-
-			clearInterval(self.pointsInterval);
-			
-			this.set('points', 100);
 
 			var paper = this.get('paper'),
 				w = this.get('w'),
-				h = this.get('h');
+				h = this.get('h'),
+				height = h,
+				width = 0.05*w,
+				x = w-width,
+				y = 0,
+				seconds = this.get('secondsPerPlayer'),
+				countdown;
 
-			var height = 0.96*h;
-			var width = 0.05*w;
-			var x = 0.94*w;
-			var y = 0.02*h;
-
-			var countdown = paper.rect(x, y, width, height);
-			countdown.attr({
-				fill: '#49E20E',
+			countdown = paper.rect(x, y, width, height).attr({
+				fill: this.get('players')[this.get('currentPlayer')].color,
 				stroke: 'none',
-				opacity: 0.6
-			});
-
-			var s = 0.03*h;
-			var pointsText = paper.text(x-10, y+s, 100).attr({
-				'fill': '#fff',
-				'text-anchor': 'end',
-				'font-size': s,
-			});
-
-			this.set('countdown', countdown);
-			this.set('pointsText', pointsText);
-
-			var maxPoints = 100;
-
-			self.pointsInterval = setInterval(function() {
-				if(maxPoints > 0) maxPoints -= 1;
-				self.get('pointsText').attr('text', maxPoints);
-				self.set('points', maxPoints);
-			}, (30*1000)/100);
-
-			countdown.animate({
-				'height': 0,
-				'fill': '#cc0000',
-				'y': height+y,
+				opacity: 0.3
+			}).animate({
+				height: 0,
+				y: height+y,
 				callback: function() {
 					self.nextPlayer();
 				}
-			}, 30*1000);
+			}, seconds*1000);
 
-			pointsText.animate({
-				'y': height+y
-			}, 30*1000);
+			this.set('countdown', countdown);
 
+			this.possibleScore(this.get('points'));
+		},
+
+		possibleScore: function(points) {
+
+			if(this.get('pointObject')) {
+				var p = this.get('pointObject');
+				p.obj.remove();
+				clearInterval(p.iter);
+			}
+
+			var target = this.get('target'),
+				paper = this.get('paper'),
+				cx = target.attr('cx'),
+				cy = target.attr('cy'),
+				duration = this.get('secondsPerPlayer')*1000/points,
+				iter, 
+				w = this.get('w'),
+				h = w*0.02;
+
+			var obj = paper.text(0.975*w, h, points).attr({
+				'fill': '#fff',
+				'font-size': h,
+				'text-anchor': 'middle'
+			});
+
+			iter = setInterval(function() {
+				var barHeight = self.get('countdown').attr('height');
+				var winHeight = self.get('h');
+				//Decrease points down to half
+				var p = Math.floor((0.5*points)*((barHeight/winHeight)+1));
+				obj.attr({ text: p });
+			}, duration);
+
+			this.set('pointObject', {
+				obj: obj,
+				iter: iter
+			});
 		},
 
 		updateScore: function(points) {
@@ -442,7 +381,6 @@ define([
 			var score = parseInt(players[current].score.attr('text'));
 			score += points;
 			players[current].score.attr('text', score);
-			//$('#player-id-'+current+' .score').text(players[current].score);
 		},
 
 		loadSound: function(name, src, loop) {
@@ -459,20 +397,30 @@ define([
 			sounds[name] = audio;
 		},
 
-		toggleSound: function(sound) {
-			if(self.get('sounds')[sound].paused) {
-    			self.playSound(sound);
-    		} else {
-    			self.stopSound(sound);
-    		}
+		toggleSound: function() {
+			if(this.get('mute')) {
+				this.unmute();
+				this.set('mute', 0);
+			} else {
+				this.mute();
+				this.set('mute', 1);
+			}
+		},
+
+		mute: function() {
+			var sounds = this.get('sounds');
+			for(s in sounds)
+				sounds[s].volume = 0;
+		},
+
+		unmute: function() {
+			var sounds = this.get('sounds');
+			for(s in sounds)
+				sounds[s].volume = 1;
 		},
 
 		playSound: function(sound) {
 			this.get('sounds')[sound].play();
-		},
-
-		stopSound: function(sound) {
-			this.get('sounds')[sound].pause();
 		},
 
 		hitTest: function(x, y) {
@@ -490,10 +438,6 @@ define([
 				'stroke': "none",
 				'fill-opacity': 0.7
 			});
-
-			/*var pat = document.getElementById("raphael-pattern-0");
-			pat.setAttribute("height", pat.getAttribute("height")*0.5);
-			pat.setAttribute("width", pat.getAttribute("width")*0.5);*/
 			
 			ball.animate({ 
 				'fill-opacity': 0, 
@@ -530,17 +474,23 @@ define([
 
 		hit: function() {
 			var dx = this.get('dx'),
-				dy = this.get('dy');
+				dy = this.get('dy'),
+				points;
 
 			this.set('dx', Math.random() > 0.5 ? dx : -dx);
 			this.set('dy', Math.random() > 0.5 ? dy : -dy);
 
-			self.set('speed', self.get('speed')+0.01);
+			self.set('speed', self.get('speed')+0.015);
 			var target = this.get('target');
 			var radius = target.attr('r');
 			target.stop();
 
-			var points = self.get('points');
+			if(self.get('pointObject')) {
+				points= parseInt(self.get('pointObject').obj.attr('text'));
+			} else {
+				points = self.get('points');
+			}
+			
 			this.updateScore(points);
 
 			target.animate({ 
@@ -549,16 +499,13 @@ define([
 					self.animate(target);
 					self.set('hittesting', 0);
 				}
-			}, 500);			
+			}, 500);
+
+			//Increase max points
+			var max = Math.floor(1.05*this.get('points'));
+			this.set('points', max);
 		},
 
-		resizeTarget: function(amount) {
-			var target = this.get('target');
-			var r = target.attr('r');
-			target.animate({
-				r: r*amount
-			}, 300);
-		}
 
 	});
 
