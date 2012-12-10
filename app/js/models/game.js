@@ -15,7 +15,7 @@ define([
 		defaults: {
 			paper: null,
 			target: null,
-			secondsPerPlayer: 30,
+			secondsPerPlayer: 15,
 			sounds: {},
 			speed: 0.02,
 			mute: 0,
@@ -182,7 +182,7 @@ define([
 				target.attr('fill', color);
 				this.get('countdown').resume();
 				this.set('pause', 0);
-				this.unmute();
+				//this.unmute();
 			} else {
 				this.get('target').pause();
 				this.get('countdown').pause();
@@ -329,7 +329,7 @@ define([
 			countdown = paper.rect(x, y, width, height).attr({
 				fill: self.getPlayerColor(),
 				stroke: 'none',
-				opacity: 1
+				opacity: 0.5
 			}).animate({
 				height: 0,
 				y: height+y,
