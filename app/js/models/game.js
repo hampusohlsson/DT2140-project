@@ -15,6 +15,7 @@ define([
 		defaults: {
 			paper: null,
 			target: null,
+			secondsPerPlayer: 30,
 			sounds: {},
 			speed: 0.01,
 			mute: 0,
@@ -25,7 +26,6 @@ define([
 			numPlayers: 0,
 			currentPlayer: 0,
 			lastHit: 0,
-			secondsPerPlayer: 45,
 			w: window.innerWidth,
 			h: window.innerHeight
 		},
@@ -119,7 +119,7 @@ define([
 				var last = this.get('lastHit');
 				var time = (new Date()).getTime();
 
-				if(time-last < 100) 
+				if(time-last < 10) 
 					return;
 				
 				var x = this.get('w') * data.x;
@@ -142,6 +142,8 @@ define([
 				break;
 
 			case app.command.FASTER:
+				if(this.get('pause'))
+					return;
 				var t = this.get('target').stop(),
 					v = this.get('speed');
 				this.set('speed', v*1.5);
@@ -149,6 +151,8 @@ define([
 				break;
 
 			case app.command.SLOWER:
+				if(this.get('pause'))
+					return;
 				var t = this.get('target').stop(),
 					v = this.get('speed');
 				this.set('speed', v/1.5);
@@ -156,11 +160,11 @@ define([
 				break;
 
 			case app.command.BIGGER:
-				this.resizeTarget(1.2);
+				this.resizeTarget(1.1);
 				break;
 
 			case app.command.SMALLER:
-				this.resizeTarget(0.8);
+				this.resizeTarget(0.9);
 				break;
 
 			default:
@@ -171,7 +175,11 @@ define([
 
 		togglePause: function() {
 			if(this.get('pause')) {
-				this.get('target').resume();
+				var target = this.get('target');
+				target.resume();
+				//Bugfix, must set color...
+				var color = this.getPlayerColor();
+				target.attr('fill', color);
 				this.get('countdown').resume();
 				this.set('pause', 0);
 				this.unmute();
@@ -186,10 +194,8 @@ define([
 		start: function() {
 			this.log('[GAME] start');
 			var target = this.get('target');
-			self.animate(target);
-
 			this.nextPlayer();
-
+			self.animate(target);
 			this.get('sounds').bg.play();
 
 			//Simulate UDP data
@@ -207,7 +213,7 @@ define([
 		},
 
 		animate: function(el) {
-		
+
 			var r = el.attr('r'),
 				x = Math.floor(r + Math.random()*(this.get('w')-2*r)),
 				y = Math.floor(r + Math.random()*(this.get('h')-2*r));
@@ -251,29 +257,29 @@ define([
 			}, 300);
 		},
 
-		showText: function(text, color) {
+		getPlayerColor: function() {
+			return this.get('players')[this.get('currentPlayer')].color;
+		},
 
-			if(this.$text)
-				this.$text.remove();
+		showHeadline: function(text, color) {
 
-			this.$text = $('<h1/>', {
-				'text': text
-			}).css({
-				'position': 'absolute',
-				'z-index': 200,
-				'width': '100%',
-				'text-align': 'center',
-				'font-size': '6em',
-				'top': '20%',
-				'padding': 0,
-				'color': color ? color : '#fff'
-			});
+			if(this.get('headline'))
+				this.get('headline').remove();
 
-			$('#page').append(this.$text);
-			this.$text.fadeOut(1000, function() {
-				if(this.$text)
-					this.$text.remove();
-			});
+			var paper = this.get('paper'),
+				w = this.get('w'),
+				h = this.get('h');
+
+			var str = paper.text(0.5*w, 0.5*h, text).attr({
+				'fill': '#fff',
+				'font-size': 0.075*w,
+				'text-anchor': 'middle',
+				'font-weight': 'bold'
+			}).animate({
+				'opacity': 0
+			}, 1000);
+
+			this.set('headline', str);
 		},
 
 		nextPlayer: function() {
@@ -301,7 +307,7 @@ define([
 			if(this.get('numPlayers') < 2)
 				return;
 
-			this.showText('Player '+next);
+			this.showHeadline('Player '+next);
 
 		},
 
@@ -321,7 +327,7 @@ define([
 				countdown;
 
 			countdown = paper.rect(x, y, width, height).attr({
-				fill: this.get('players')[this.get('currentPlayer')].color,
+				fill: self.getPlayerColor(),
 				stroke: 'none',
 				opacity: 0.3
 			}).animate({
@@ -352,11 +358,11 @@ define([
 				duration = this.get('secondsPerPlayer')*1000/points,
 				iter, 
 				w = this.get('w'),
-				h = w*0.02;
+				h = this.get('h');
 
-			var obj = paper.text(0.975*w, h, points).attr({
-				'fill': '#fff',
-				'font-size': h,
+			var obj = paper.text(0.975*w, 0.97*h, points).attr({
+				'fill': self.getPlayerColor(),
+				'font-size': 0.025*w,
 				'text-anchor': 'middle'
 			});
 
@@ -375,7 +381,7 @@ define([
 		},
 
 		updateScore: function(points) {
-			this.showText(points+' points');
+			this.showHeadline(points+' points');
 			var current = this.get('currentPlayer');
 			var players = this.get('players');
 			var score = parseInt(players[current].score.attr('text'));
@@ -398,6 +404,9 @@ define([
 		},
 
 		toggleSound: function() {
+			if(this.get('pause'))
+				return;
+
 			if(this.get('mute')) {
 				this.unmute();
 				this.set('mute', 0);
@@ -431,8 +440,7 @@ define([
 			this.set('hittesting', 1);
 			
 			var paper = this.get('paper');
-
-			var ball = paper.circle(x,y,this.get('h')/18).attr({
+			var ball = paper.circle(x, y, this.get('h')/18).attr({
 				'fill': "#fff",
 				'scale': 0.5,
 				'stroke': "none",
@@ -444,18 +452,18 @@ define([
 				callback: function() {
 					ball.remove();
 				} 
-			}, 50);
+			}, 200);
 
 			var t = this.get('target');
 			var s = Math.sqrt(Math.pow(t.attr('cx')-x,2)+Math.pow(t.attr('cy')-y,2));
+
+			//If ball is 25% inside target, count as hit
+			var hit = s-(t.attr('r')+0.5*ball.attr('r')) < 0;
 			
-			if(s < t.attr('r')) {
+			if(hit) {
 				this.playSound('hit');
 				this.hit();
-				
-				if(this.get('numPlayers') > 1)
-					this.playerCountdown();
-
+				this.get('countdown').stop();
 				var flash = paper.rect(0,0,this.get('w'),this.get('h')).attr({
 					fill: '#fff'
 				});
@@ -498,12 +506,13 @@ define([
 				callback: function() {
 					self.animate(target);
 					self.set('hittesting', 0);
+					self.playerCountdown();
 				}
 			}, 500);
 
 			//Increase max points
-			var max = Math.floor(1.05*this.get('points'));
-			this.set('points', max);
+			//var max = Math.floor(1.05*this.get('points'));
+			//this.set('points', max);
 		},
 
 

@@ -20,6 +20,9 @@ app.use(express.static(__dirname + '/app'));
 
 app.get('/', function (req, res) {
 	res.sendfile('index.html');
+	this.on('finish', function() { 
+		req.socket.removeListener('error', error); 
+	});
 });
 
 /**
@@ -36,8 +39,8 @@ tuio.init({
 /**
  * General UDP Data Handling
  */
-var dgram = require("dgram"),
-	UDP = dgram.createSocket("udp4");
+var dgram = require("dgram");
+var UDP = dgram.createSocket("udp4");
 
 UDP.on("listening", function() {
 	var address = UDP.address();
@@ -45,7 +48,7 @@ UDP.on("listening", function() {
 
 UDP.bind(ports.dataUDP);
 
-io.set("log level", 1);
+io.set("log level", 0);
 io.sockets.on("connection", function(socket) {
 	UDP.on("message", function(msg) {
 		socket.emit("message", msg.toString());
