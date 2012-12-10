@@ -17,7 +17,7 @@ define([
 			target: null,
 			secondsPerPlayer: 30,
 			sounds: {},
-			speed: 0.01,
+			speed: 0.02,
 			mute: 0,
 			points: 100,
 			pause: 0,
@@ -329,7 +329,7 @@ define([
 			countdown = paper.rect(x, y, width, height).attr({
 				fill: self.getPlayerColor(),
 				stroke: 'none',
-				opacity: 0.3
+				opacity: 1
 			}).animate({
 				height: 0,
 				y: height+y,
@@ -361,7 +361,7 @@ define([
 				h = this.get('h');
 
 			var obj = paper.text(0.975*w, 0.97*h, points).attr({
-				'fill': self.getPlayerColor(),
+				'fill': '#fff',
 				'font-size': 0.025*w,
 				'text-anchor': 'middle'
 			});
@@ -476,6 +476,8 @@ define([
 			} else {
 				this.playSound('miss');
 				self.set('hittesting', 0);
+				self.nextPlayer();
+				self.playerCountdown();
 			}
 			
 		},
