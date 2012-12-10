@@ -180,9 +180,9 @@ define([
 
 				if(!this.get('textGesture')) {
 
-					this.set('textGesture', this.get('paper').text(0.01*w, 0.94*h, 'Tracking gestures').attr({
+					this.set('textGesture', this.get('paper').text(0.04*w, 0.88*h, 'Tracking gestures').attr({
 						'fill': '#c00',
-						'font-size': 0.05*h,
+						'font-size': 0.08*h,
 						'text-anchor': 'start'
 					}));
 				}
