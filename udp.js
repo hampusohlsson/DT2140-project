@@ -1,15 +1,16 @@
-var dgram = require('dgram');
-var client = dgram.createSocket("udp4");
-
-var x = Math.floor(Math.random()*1000),
-	y = Math.floor(Math.random()*400);
-
-var host = "127.0.0.1";
-var port = 5555;
-
-var a = 0;
+/**
+ * Simulation of UDP datagrams
+ * Usage: node udp.js <command>
+ */
+var dgram = require('dgram'),
+	client = dgram.createSocket("udp4"),
+	host = "127.0.0.1",
+	port = 5555,
+	a = 0,
+	message;
 
 switch(process.argv[2]) {
+	case 'hit': 	a = 1; break;
 	case 'pause': 	a = 2; break;
 	case 'play': 	a = 3; break;
 	case 'mute': 	a = 4; break;
@@ -19,9 +20,17 @@ switch(process.argv[2]) {
 	case 'smaller': a = 8; break;
 }
 
-var message = new Buffer("{\"action\":"+a+"}");
+if(a == 1) {
+	message = "{\"action\":"+a+",\"x\":"+Math.random()+",\"y\":"+Math.random()+"}";
+} else {
+	message = "{\"action\":"+a+"}";
+}
 
-client.send(message, 0, message.length, port, host, function(err, bytes) {
+console.log(host, port, message);
+
+var buffer = new Buffer(message);
+
+client.send(buffer, 0, buffer.length, port, host, function(err, bytes) {
 	client.close();
 });
 
