@@ -51,6 +51,7 @@ UDP.bind(ports.dataUDP);
 io.set("log level", 0);
 io.sockets.on("connection", function(socket) {
 	UDP.on("message", function(msg) {
+		//console.log(msg.toString());
 		socket.emit("message", msg.toString());
 	});
 });

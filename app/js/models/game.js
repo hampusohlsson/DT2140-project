@@ -167,6 +167,13 @@ define([
 				this.resizeTarget(0.9);
 				break;
 
+			case app.command.GESTURE:
+				var target = this.get('target');
+				var w = this.get('w');
+				var originalSize = w/3;
+				target.attr('r', originalSize*data.scale);
+				break;
+
 			default:
 				self.log('[GAME] Unknown action: '+data.action);
 				break;

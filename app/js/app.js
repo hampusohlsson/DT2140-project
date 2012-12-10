@@ -42,6 +42,7 @@ define([
 			SLOWER: 6,
 			BIGGER: 7,
 			SMALLER: 8,
+			GESTURE: 9,
 		}
 
 		Backbone.history.start({ 
