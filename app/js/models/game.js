@@ -26,6 +26,7 @@ define([
 			numPlayers: 0,
 			currentPlayer: 0,
 			lastHit: 0,
+			lastGesture: 0,
 			w: window.innerWidth,
 			h: window.innerHeight
 		},
@@ -168,10 +169,33 @@ define([
 				break;
 
 			case app.command.GESTURE:
+
 				var target = this.get('target');
 				var w = this.get('w');
 				var originalSize = w/3;
 				target.attr('r', originalSize*data.scale);
+
+				var w = this.get('w');
+				var h = this.get('h');
+
+				if(!this.get('textGesture')) {
+
+					this.set('textGesture', this.get('paper').text(0.01*w, 0.94*h, 'Tracking gestures').attr({
+						'fill': '#c00',
+						'font-size': 0.05*h,
+						'text-anchor': 'start'
+					}));
+				}
+
+				this.set('lastGesture', (new Date()).getTime());
+
+				setTimeout(function() {
+					var last = self.get('lastGesture');
+					var time = (new Date()).getTime();
+					if(time-last > 200 && self.get('textGesture'))
+						self.get('textGesture').remove();
+				}, 200);
+
 				break;
 
 			default:
