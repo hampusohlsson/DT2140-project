@@ -17,7 +17,7 @@ define([
 			target: null,
 			secondsPerPlayer: 15,
 			sounds: {},
-			speed: 0.02,
+			speed: 0.05,
 			mute: 0,
 			points: 100,
 			pause: 0,
@@ -180,9 +180,9 @@ define([
 
 				if(!this.get('textGesture')) {
 
-					this.set('textGesture', this.get('paper').text(0.04*w, 0.88*h, 'Tracking gestures').attr({
-						'fill': '#c00',
-						'font-size': 0.08*h,
+					this.set('textGesture', this.get('paper').text(0.02*w, 0.93*h, 'Tracking gestures').attr({
+						'fill': '#ccc',
+						'font-size': 0.05*h,
 						'text-anchor': 'start'
 					}));
 				}
@@ -192,8 +192,10 @@ define([
 				setTimeout(function() {
 					var last = self.get('lastGesture');
 					var time = (new Date()).getTime();
-					if(time-last > 200 && self.get('textGesture'))
+					if(time-last > 200 && self.get('textGesture')) {
 						self.get('textGesture').remove();
+						self.set('textGesture', null);
+					}
 				}, 200);
 
 				break;

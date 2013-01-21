@@ -7,30 +7,49 @@ var dgram = require('dgram'),
 	host = "127.0.0.1",
 	port = 5555,
 	a = 0,
-	message;
+	action = process.argv[2];
 
-switch(process.argv[2]) {
-	case 'hit': 	a = 1; break;
-	case 'pause': 	a = 2; break;
-	case 'play': 	a = 3; break;
-	case 'mute': 	a = 4; break;
-	case 'faster': 	a = 5; break;
-	case 'slower': 	a = 6; break;
-	case 'bigger': 	a = 7; break;
-	case 'smaller': a = 8; break;
+function getMessage() {
+	var message = null;
+	switch(action) {
+		case 'hit': 	
+			message = "{\"action\":"+a+",\"x\":"+Math.random()+",\"y\":"+Math.random()+"}";
+			a = 1; 
+			break;
+		case 'pause': 	a = 2; break;
+		case 'play': 	a = 3; break;
+		case 'mute': 	a = 4; break;
+		case 'faster': 	a = 5; break;
+		case 'slower': 	a = 6; break;
+		case 'bigger': 	a = 7; break;
+		case 'smaller': a = 8; break;
+		case 'scale': 
+			a = 9;
+			message = "{\"action\":"+a+",\"scale\":"+Math.random()+"}";
+			break;
+	}
+
+	return message ? message : "{\"action\":"+a+"}";
 }
 
-if(a == 1) {
-	message = "{\"action\":"+a+",\"x\":"+Math.random()+",\"y\":"+Math.random()+"}";
+if(action == 'scale') {
+	setInterval(function() {
+		var msg = getMessage();
+		var buffer = new Buffer(msg);
+		console.log(msg);
+		client.send(buffer, 0, buffer.length, port, host, function(err, bytes) {
+			//client.close();
+		});
+	}, 100);
 } else {
-	message = "{\"action\":"+a+"}";
+	var msg = getMessage();
+	var buffer = new Buffer(msg);
+	console.log(msg);
+	client.send(buffer, 0, buffer.length, port, host, function(err, bytes) {
+		client.close();
+	});
 }
 
-console.log(host, port, message);
 
-var buffer = new Buffer(message);
 
-client.send(buffer, 0, buffer.length, port, host, function(err, bytes) {
-	client.close();
-});
 
